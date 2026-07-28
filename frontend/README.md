@@ -1,4 +1,3 @@
-
 # Frontend — AI Powered Services Suite
 
 This folder contains the Next.js frontend for the AI Powered Services Suite. It provides a small UI to interact with the services in the root `services/` folder (AI, booking, resume, etc.) and includes references for local development.
@@ -93,4 +92,3 @@ pnpm start:all
 ```
 
 If a service doesn't yet include source files, the `dev` scripts are placeholders using `tsx` — create `src/index.ts` for each service to enable them.
-

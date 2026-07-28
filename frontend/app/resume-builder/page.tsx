@@ -1,3 +1,3 @@
 export default function ResumeBuilderPage() {
-	return null;
+  return null;
 }

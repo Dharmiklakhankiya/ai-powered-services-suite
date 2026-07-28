@@ -10,7 +10,12 @@
     "dev:resume": "pnpm --filter @suite/resume-service run dev",
     "dev:services": "pnpm -r --parallel --filter @suite/booking-service --filter @suite/ai-service --filter @suite/resume-service run dev",
     "build": "pnpm -r --if-present run build",
-    "start": "pnpm -r --parallel --filter @suite/frontend --filter @suite/booking-service --filter @suite/ai-service --filter @suite/resume-service run start"
+    "start": "pnpm -r --parallel --filter @suite/frontend --filter @suite/booking-service --filter @suite/ai-service --filter @suite/resume-service run start",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
   },
-  "packageManager": "pnpm@10.33.0"
+  "packageManager": "pnpm@10.33.0",
+  "devDependencies": {
+    "prettier": "^3.9.6"
+  }
 }

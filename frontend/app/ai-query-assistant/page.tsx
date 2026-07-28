@@ -1,3 +1,3 @@
 export default function AIQueryAssistantPage() {
-	return null;
+  return null;
 }
