@@ -5,19 +5,19 @@ const services = [
 	{
 		title: 'Consulting Booking',
 		description: 'Schedule a session with the right service expert in a few steps.',
-		href: '#',
+		href: '/consulting-booking',
 		cta: 'Book',
 	},
 	{
 		title: 'AI Query Assistant',
 		description: 'Get fast answers from a focused assistant built for service workflows.',
-		href: '#',
+		href: '/ai-query-assistant',
 		cta: 'Ask',
 	},
 	{
 		title: 'Resume Builder',
 		description: 'Create a clean, job-ready resume with a guided editing flow.',
-		href: '#',
+		href: '/resume-builder',
 		cta: 'Build',
 	},
 ] as const;
