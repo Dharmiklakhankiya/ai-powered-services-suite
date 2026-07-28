@@ -1,12 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import PhoneInput from "react-phone-number-input";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
 export default function BookingForm() {
-  const consultationDurationMinutes = 30;
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [Agenda, setAgenda] = useState("");
   const [phone, setPhone] = useState("");
+  const [date, setDate] = useState(() =>
+    new Date().toLocaleDateString("en-CA"),
+  );
+
+  const [phoneError, setPhoneError] = useState("");
+
+  const validatePhone = (value: string) => {
+    if (!value) {
+      setPhoneError("Phone number is required");
+      return false;
+    }
+
+    if (!isValidPhoneNumber(value)) {
+      setPhoneError("Enter a valid phone number");
+      return false;
+    }
+
+    setPhoneError("");
+    return true;
+  };
+
   return (
     <section className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10 lg:px-0">
       <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-5 py-6 sm:px-6 sm:py-7">
@@ -32,12 +55,15 @@ export default function BookingForm() {
                   *
                 </span>
               </label>
+
               <input
                 id="name"
                 name="name"
                 type="text"
                 required
-                placeholder="Your full name"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="h-11 rounded-lg border border-[var(--line)] bg-transparent px-3 text-sm outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--foreground)]"
               />
             </div>
@@ -58,6 +84,8 @@ export default function BookingForm() {
                 type="email"
                 required
                 placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="h-11 rounded-lg border border-[var(--line)] bg-transparent px-3 text-sm outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--foreground)]"
               />
             </div>
@@ -73,16 +101,39 @@ export default function BookingForm() {
                     *
                   </span>
                 </label>
+
                 <PhoneInput
                   id="phone"
                   name="phone"
                   required
                   defaultCountry="IN"
+                  international
                   value={phone}
-                  onChange={(value) => setPhone(value ?? "")}
+                  onChange={(value) => {
+                    setPhone(value ?? "");
+
+                    if (phoneError && value) {
+                      setPhoneError(
+                        isValidPhoneNumber(value)
+                          ? ""
+                          : "Enter a valid phone number",
+                      );
+                    }
+                  }}
+                  onBlur={() => validatePhone(phone)}
                   placeholder="Phone number"
-                  className="h-11 rounded-lg border border-[var(--line)] bg-transparent px-3 text-sm outline-none transition-colors focus-within:border-[var(--foreground)] [&_.PhoneInputInput]:border-0 [&_.PhoneInputInput]:bg-transparent [&_.PhoneInputInput]:outline-none"
+                  className={`h-11 rounded-lg border bg-transparent px-3 text-sm outline-none transition-colors
+                    focus-within:border-[var(--foreground)]
+                    [&_.PhoneInputInput]:border-0
+                    [&_.PhoneInputInput]:bg-transparent
+                    [&_.PhoneInputInput]:outline-none
+                    ${phoneError ? "border-red-500" : "border-[var(--line)]"}
+                  `}
                 />
+
+                {phoneError && (
+                  <p className="mt-1 text-sm text-red-500">{phoneError}</p>
+                )}
               </div>
 
               <div className="grid gap-2">
@@ -95,12 +146,15 @@ export default function BookingForm() {
                     *
                   </span>
                 </label>
+
                 <input
                   id="consultation-date"
                   name="consultation-date"
                   type="date"
                   required
-                  min={new Date().toLocaleDateString("en-CA")}
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  min={date}
                   max={new Date(
                     Date.now() + 30 * 24 * 60 * 60 * 1000,
                   ).toLocaleDateString("en-CA")}
@@ -124,21 +178,18 @@ export default function BookingForm() {
                 *
               </span>
             </label>
+
             <textarea
               id="meeting-agenda"
               name="meeting-agenda"
               required
               rows={4}
               placeholder="Briefly describe what you'd like to discuss"
+              value={Agenda}
+              onChange={(e) => setAgenda(e.target.value)}
               className="min-h-[110px] rounded-lg border border-[var(--line)] bg-transparent px-3 py-3 text-sm outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--foreground)]"
             />
           </div>
-
-          <input
-            type="hidden"
-            name="duration"
-            value={String(consultationDurationMinutes)}
-          />
 
           <div className="pt-1">
             <button
