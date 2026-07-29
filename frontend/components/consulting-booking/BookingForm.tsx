@@ -16,7 +16,6 @@ export default function BookingForm() {
   const [phoneError, setPhoneError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const validatePhone = (value: string) => {
     if (!value) {
@@ -39,7 +38,6 @@ export default function BookingForm() {
 
     setIsSubmitting(true);
     setSubmitError("");
-    setSubmitSuccess(false);
 
     try {
       const response = await fetch("/api/booking", {
@@ -64,7 +62,6 @@ export default function BookingForm() {
         );
       }
 
-      setSubmitSuccess(true);
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
@@ -99,11 +96,6 @@ export default function BookingForm() {
           aria-label="Consulting booking form"
           onSubmit={handleSubmit}
         >
-          {submitSuccess && (
-            <div className="rounded-lg bg-green-500/10 p-4 text-sm text-green-600 border border-green-500/20">
-              Your consultation request has been submitted successfully! We will be in touch soon.
-            </div>
-          )}
 
           {submitError && (
             <div className="rounded-lg bg-red-500/10 p-4 text-sm text-red-600 border border-red-500/20">
