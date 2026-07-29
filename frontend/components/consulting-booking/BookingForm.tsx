@@ -7,13 +7,16 @@ import "react-phone-number-input/style.css";
 export default function BookingForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [Agenda, setAgenda] = useState("");
+  const [agenda, setAgenda] = useState("");
   const [phone, setPhone] = useState("");
   const [date, setDate] = useState(() =>
     new Date().toLocaleDateString("en-CA"),
   );
 
   const [phoneError, setPhoneError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const validatePhone = (value: string) => {
     if (!value) {
@@ -30,6 +33,54 @@ export default function BookingForm() {
     return true;
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!validatePhone(phone)) return;
+
+    setIsSubmitting(true);
+    setSubmitError("");
+    setSubmitSuccess(false);
+
+    try {
+      const response = await fetch("/api/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          date,
+          agenda,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            (data.errors && Object.values(data.errors)[0]) ||
+            "Failed to submit booking",
+        );
+      }
+
+      setSubmitSuccess(true);
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        setName("");
+        setEmail("");
+        setAgenda("");
+        setPhone("");
+        setDate(new Date().toLocaleDateString("en-CA"));
+      }
+    } catch (err: any) {
+      setSubmitError(err.message || "An error occurred while submitting.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10 lg:px-0">
       <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-5 py-6 sm:px-6 sm:py-7">
@@ -43,7 +94,23 @@ export default function BookingForm() {
           </p>
         </div>
 
-        <form className="mt-6 grid gap-5" aria-label="Consulting booking form">
+        <form 
+          className="mt-6 grid gap-5" 
+          aria-label="Consulting booking form"
+          onSubmit={handleSubmit}
+        >
+          {submitSuccess && (
+            <div className="rounded-lg bg-green-500/10 p-4 text-sm text-green-600 border border-green-500/20">
+              Your consultation request has been submitted successfully! We will be in touch soon.
+            </div>
+          )}
+
+          {submitError && (
+            <div className="rounded-lg bg-red-500/10 p-4 text-sm text-red-600 border border-red-500/20">
+              {submitError}
+            </div>
+          )}
+
           <div className="grid gap-5 md:grid-cols-2">
             <div className="grid gap-2">
               <label
@@ -185,7 +252,7 @@ export default function BookingForm() {
               required
               rows={4}
               placeholder="Briefly describe what you'd like to discuss"
-              value={Agenda}
+              value={agenda}
               onChange={(e) => setAgenda(e.target.value)}
               className="min-h-[110px] rounded-lg border border-[var(--line)] bg-transparent px-3 py-3 text-sm outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--foreground)]"
             />
@@ -194,9 +261,10 @@ export default function BookingForm() {
           <div className="pt-1">
             <button
               type="submit"
-              className="inline-flex items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--foreground)] px-5 py-3 text-sm font-medium text-[var(--background)] transition-[opacity] duration-200 ease-out hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--foreground)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+              disabled={isSubmitting}
+              className="inline-flex items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--foreground)] px-5 py-3 text-sm font-medium text-[var(--background)] transition-[opacity] duration-200 ease-out hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--foreground)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Continue to Payment
+              {isSubmitting ? "Submitting..." : "Continue to Payment"}
             </button>
           </div>
         </form>
